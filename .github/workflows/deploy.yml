@@ -2,27 +2,23 @@ name: Deploy to S3
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
+    branches: [master] # change if your default branch is different (e.g. master)
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Sync repo root to S3 bucket root
+      - name: Upload index.html to S3 bucket root
         run: |
-          aws s3 sync . s3://${{ secrets.S3_BUCKET }}/ \
-            --delete \
-            --exclude ".git/*" \
-            --exclude ".github/*"
+          aws s3 cp index.html s3://cmtr-ck3ko7i5-bucket-1794258310/index.html \
+            --content-type "text/html"
